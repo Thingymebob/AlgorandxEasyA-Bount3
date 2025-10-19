@@ -1,0 +1,14 @@
+name: Pull Request validation
+
+on: [pull_request]
+
+
+jobs:
+  bount3-contracts-ci:
+    name: Run bount3-contracts validation
+    uses: ./.github/workflows/bount3-contracts-ci.yaml
+
+  bount3-frontend-ci:
+    name: Run bount3-frontend validation
+    uses: ./.github/workflows/bount3-frontend-ci.yaml
+

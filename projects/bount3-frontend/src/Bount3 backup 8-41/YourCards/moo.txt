@@ -1,0 +1,7 @@
+TITLE: Searching for Cows
+ORGANISATION: Cow tech
+SHORT_DESCRIPTION: we are going to find the cows
+LONG_DESCRIPTION: we need to find the cows, they need out help and are very cold
+ALGO_PAID_PER_SUBMISSION: 0.5
+LOGO: Bird.jpg
+DATATYPES: [JPG - "a cat" , PNG - "a dog" , MOV - "a fish"]

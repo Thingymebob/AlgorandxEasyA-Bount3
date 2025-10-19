@@ -1,0 +1,7 @@
+TITLE: cow
+ORGANISATION: mooinc
+SHORT_DESCRIPTION: hsort
+LONG_DESCRIPTION: long
+ALGO_PAID_PER_SUBMISSION: hsort
+LOGO: Bird.jpg
+DATATYPES: [JPG - "a cat" , PNG - "a dog" , MOV - "a fish"]

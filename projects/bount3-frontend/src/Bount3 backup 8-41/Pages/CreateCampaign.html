@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="../Style.css" />
+    <script defer src="../Scripts/TopBarLoader.js"></script>
+    <script defer src="../Scripts/CreateCampaignManager.js"></script>
+  </head>
+  <body>
+    <div id="topbar-placeholder"></div>
+    <main class="Content">
+      <div class="CreateCampaignLayout">
+        <!-- Left Side: Form -->
+        <div class="FormSection">
+          <form class="CreateCampaignForm" enctype="multipart/form-data">
+            <label for="campaign-title">Campaign Title</label>
+            <input
+              type="text"
+              id="campaign-title"
+              name="campaign-title"
+              maxlength="100"
+              required
+              placeholder="Please enter a title for your campaign..."
+            />
+
+            <label for="organisation">Organisation</label>
+            <input
+              type="text"
+              id="organisation"
+              name="organisation"
+              maxlength="100"
+              placeholder="Optional, enter your organisation..."
+            />
+
+            <label for="short-desc">Short Description</label>
+            <textarea
+              id="short-desc"
+              name="short-desc"
+              maxlength="200"
+              rows="2"
+              required
+              placeholder="please enter a short Description of your campaign (max 200 characters)..."
+            ></textarea>
+
+            <label for="long-desc">Long Description</label>
+            <textarea
+              id="long-desc"
+              name="long-desc"
+              rows="6"
+              required
+              placeholder="please enter a Detailed descryption of your campaign, you can include why this campaign is important and what you hope to acheave with the information you collect"
+            ></textarea>
+
+            <label for="algo-paid">ALGO Paid</label>
+            <textarea
+              id="algo-paid"
+              name="algo-paid"
+              rows="1"
+              required
+              placeholder="please enter the amount paid in ALGO per submission to this campaign"
+            ></textarea>
+
+            <label for="MaxSubmissions">Maximum submissions</label>
+            <textarea
+              id="MaxSubmissions"
+              name="MaxSubmissions"
+              rows="1"
+              required
+              placeholder="please enter the maximum amount of submissions you intend to accept for this campaign"
+            ></textarea>
+
+            <label for="logo">Campaign Logo</label>
+            <input
+              type="file"
+              id="logo"
+              name="logo"
+              accept="image/*"
+              required
+            />
+
+            <button type="submit">Create Campaign</button>
+          </form>
+        </div>
+
+        <!-- Right Side: Customizable Grid -->
+        <div class="TilesSection">
+          <div class="TilesGrid">
+            <!-- Tiles will be added here dynamically -->
+          </div>
+          <button class="AddTileButton" type="button">
+            + Add New Data Type
+          </button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

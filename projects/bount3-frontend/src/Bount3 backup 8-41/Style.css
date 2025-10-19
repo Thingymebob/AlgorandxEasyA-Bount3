@@ -1,0 +1,564 @@
+/* --- Campaign Info Card Styles --- */
+.CampaignInfoCard {
+  max-width: 520px;
+  margin: 2em auto;
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 2em 2.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2em;
+}
+.CampaignLogo {
+  width: 100%;
+  max-width: 480px;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  margin-bottom: 2em;
+}
+.CampaignInfoCard h1 {
+  font-size: 2em;
+  margin: 0.2em 0 0.1em 0;
+  color: rgb(255, 255, 255);
+}
+.CampaignInfoCard h3 {
+  font-size: 1.1em;
+  color: #ffffff;
+  margin: 0 0 0.5em 0;
+}
+.CampaignInfoCard p {
+  font-size: 1.15em;
+  color: #ffffff;
+  margin: 0.7em 0;
+  text-align: center;
+}
+:root {
+  --page-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  font: 1em sans-serif;
+  --welcome-text-color: rgba(255, 157, 0, 0.716);
+  --welcome-text-hover-color: rgb(255, 77, 0);
+  /* top bar styling */
+  --topbar-height: 75px;
+  --topbar-gap: 0px;
+  --topbar-color: rgba(0, 0, 0, 0.5);
+  --top-bar-button-color: rgb(255, 157, 0);
+  --top-bar-button-hover-color: rgb(255, 77, 0);
+  --top-bar-button-height-padding: 7px;
+  --top-bar-button-width-padding: 12px;
+  --top-bar-button-text-size: 24px;
+  --top-bar-button-text-color: rgb(255, 255, 255);
+  /* content and card styling */
+  --content-padding: 20px;
+  --card-bg: rgba(255, 255, 255, 0.06);
+  --card-bg-hover: rgba(255, 255, 255, 0.12);
+  --card-border: rgba(255, 255, 255, 0.18);
+  --card-radius: 12px;
+  --card-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  /* category colors */
+  --cat-image: rgba(35, 120, 255, 0.12);
+  --cat-image-border: rgba(35, 120, 255, 0.28);
+  --cat-video: rgba(255, 70, 70, 0.12);
+  --cat-video-border: rgba(255, 70, 70, 0.28);
+  --cat-audio: rgba(40, 180, 70, 0.12);
+  --cat-audio-border: rgba(40, 180, 70, 0.28);
+  --cat-doc: rgba(140, 80, 200, 0.12);
+  --cat-doc-border: rgba(140, 80, 200, 0.28);
+  --cat-data: rgba(20, 180, 180, 0.12);
+  --cat-data-border: rgba(20, 180, 180, 0.28);
+}
+
+h1.Welcome {
+  color: var(--welcome-text-color);
+  background-color: rgba(0, 0, 0, 0.4);
+  text-align: center;
+  font-size: 200px;
+  transition:
+    color 1.25s,
+    background-color 1s;
+}
+
+h1.Welcome:hover {
+  color: var(--welcome-text-hover-color);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+a.WelcomeButton {
+  color: aqua;
+  display: block;
+  padding: 8px 12px;
+  transition: background 0.1s;
+  --card-min-size: 220px; /* min width/height for square tiles */
+  border-radius: 4px;
+}
+
+a.WelcomeButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.TopBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--topbar-height);
+  background: var(--topbar-color);
+  padding: 8px 20px;
+  box-sizing: border-box;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end; /* push items to the right */
+}
+
+/* ensure list items in the TopBar don't show bullets */
+.TopBar li {
+  list-style: none;
+}
+
+a.TopBarButton {
+  color: var(--top-bar-button-text-color);
+  font-size: var(--top-bar-button-text-size);
+  font-weight: 75;
+  background: var(--top-bar-button-color);
+  transition: background 0.4s;
+  padding: var(--top-bar-button-height-padding) var(--top-bar-button-width-padding);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+a.TopBarButton:hover {
+  background: var(--top-bar-button-hover-color);
+}
+
+.Content {
+  /* make content flow below the fixed top bar */
+  position: relative;
+  margin-top: 0; /* spacing now handled globally on body */
+  min-height: calc(100vh - var(--topbar-height) - var(--topbar-gap)); /* fill the rest of the viewport */
+  background: rgba(255, 255, 255, 0.2);
+  padding: var(--content-padding);
+}
+
+/* Responsive grid of clickable Campaign cards */
+.OptionsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* always 5 cards per row */
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Square, image-first cards */
+a.OptionCard {
+  display: block;
+  position: relative;
+  aspect-ratio: 1 / 1; /* keep cards perfectly square */
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: #fff;
+  text-decoration: none;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+/* image fills the square */
+.OptionCard .OptionImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* optional info overlay at the bottom of the card */
+
+.OptionCard .OptionInfoTop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 10px 12px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+
+.OptionCard .OptionInfoBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+
+.OptionCard .OptionInfoTop h2,
+.OptionCard .OptionInfoTop h3 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.OptionCard .OptionInfoBottom h4,
+.OptionCard .OptionInfoBottom p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+a.OptionCard:hover,
+a.OptionCard:focus-visible {
+  background: var(--card-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+img.OptionImage {
+  filter: blur(2px); /* blur the image */
+  transition: filter 180ms; /* smooth changes on hover/state changes */
+}
+
+/* example: remove blur on hover */
+a.OptionCard:hover img.OptionImage {
+  filter: blur(0);
+}
+
+body {
+  /* push page content below the fixed top bar (plus a visual gap) */
+  margin: 0; /* remove default browser margins */
+  padding-top: calc(var(--topbar-height) + var(--topbar-gap));
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+    /* Use the same relative reference as the original stylesheet so the
+         background is resolved relative to this CSS file (the old project
+         used "immages/Background.jpg"). */
+      url('immages/Background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  font-family: var(--page-font);
+}
+/* --- Create Campaign Form Styles --- */
+.CreateCampaignLayout {
+  display: flex;
+  gap: 2em;
+  height: 100%;
+  padding: var(--content-padding);
+}
+
+.FormSection {
+  flex: 0 0 420px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.FormSection h1 {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.CreateCampaignForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  background: var(--card-bg);
+  padding: 2em 2.5em;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  /* allow the form to stretch and scroll internally */
+  flex: 1 1 auto;
+  overflow: auto;
+}
+.CreateCampaignForm label {
+  font-weight: 600;
+  margin-bottom: 0.2em;
+}
+.CreateCampaignForm input[type='text'],
+.CreateCampaignForm textarea {
+  font: inherit;
+  padding: 0.5em 0.7em;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.13);
+  color: #222;
+  resize: none;
+}
+.CreateCampaignForm textarea {
+  min-height: 2.5em;
+}
+.CreateCampaignForm input[type='file'] {
+  margin-top: 0.3em;
+}
+.CreateCampaignForm button[type='submit'] {
+  margin-top: 1.2em;
+  padding: 0.7em 1.2em;
+  background: var(--top-bar-button-color);
+  color: var(--top-bar-button-text-color);
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.CreateCampaignForm button[type='submit']:hover {
+  background: var(--top-bar-button-hover-color);
+}
+
+/* --- Tiles Section (Right Side) --- */
+.TilesSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.TilesSection h2 {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.TilesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* exactly 3 tiles per row - larger tiles */
+  gap: var(--content-padding);
+  flex: 1 1 auto;
+  /* scroll only the grid when tiles overflow */
+  overflow: auto;
+  min-height: 0; /* allow flex children to shrink properly */
+}
+
+.AddTileButton {
+  margin-top: 1.5em;
+  padding: 0.7em 1.2em;
+  background: var(--top-bar-button-color);
+  color: var(--top-bar-button-text-color);
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.AddTileButton:hover {
+  background: var(--top-bar-button-hover-color);
+}
+
+/* --- Data Tiles --- */
+.DataTile {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+  aspect-ratio: 1 / 1; /* keep tiles perfectly square */
+  min-height: 0; /* prevent overflow issues with aspect-ratio */
+}
+
+.DataTile:hover {
+  background: var(--card-bg-hover);
+  transform: translateY(-2px);
+}
+
+.TileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 0.5em;
+}
+
+.TileNumber {
+  font-weight: 600;
+  color: var(--top-bar-button-color);
+}
+
+.RemoveTileBtn {
+  background: rgba(255, 77, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.RemoveTileBtn:hover {
+  background: rgb(255, 77, 0);
+}
+
+.TileContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  flex: 1;
+}
+
+.TileContent label {
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.DataTypeSelect {
+  font: inherit;
+  padding: 0.5em;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.13);
+  color: #222;
+  cursor: pointer;
+  font-size: 0.95em;
+}
+
+.DataTypeSelect:focus {
+  outline: 2px solid var(--top-bar-button-color);
+  outline-offset: 2px;
+}
+
+/* coloured variants per data category */
+.DataTile.type-image {
+  background: var(--cat-image);
+  border-color: var(--cat-image-border);
+}
+.DataTile.type-video {
+  background: var(--cat-video);
+  border-color: var(--cat-video-border);
+}
+.DataTile.type-audio {
+  background: var(--cat-audio);
+  border-color: var(--cat-audio-border);
+}
+.DataTile.type-doc {
+  background: var(--cat-doc);
+  border-color: var(--cat-doc-border);
+}
+.DataTile.type-data {
+  background: var(--cat-data);
+  border-color: var(--cat-data-border);
+}
+
+/* --- Expected textarea inside tiles --- */
+.TileExpected {
+  font: 0.95em/1.3 var(--page-font);
+  padding: 0.45em 0.6em;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #111;
+  resize: vertical;
+  min-height: 38px;
+  max-height: 120px;
+}
+.TileExpected:focus {
+  outline: 2px solid var(--top-bar-button-color);
+  outline-offset: 2px;
+}
+
+/* --- Upload Section Styles --- */
+.UploadSection {
+  margin-top: 2em;
+  padding: 1.5em;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.UploadSection h3 {
+  margin: 0 0 0.5em 0;
+  color: var(--top-bar-button-color);
+  font-size: 1.3em;
+}
+
+.UploadItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.UploadItem label {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1em;
+}
+
+.UploadInput {
+  padding: 0.5em;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+}
+
+.SubmitDataButton {
+  margin-top: 1em;
+  padding: 0.8em 1.5em;
+  background: var(--top-bar-button-color);
+  color: var(--top-bar-button-text-color);
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.SubmitDataButton:hover {
+  background: var(--top-bar-button-hover-color);
+}
+
+/* --- Campaign Viewer Two-Column Layout --- */
+.CampaignInfoLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.CampaignDetails,
+.CampaignUploads {
+  overflow: auto;
+  min-height: 0; /* allow proper scrolling inside columns */
+}
+
+/* Remove narrow max-width when inside the two-column layout */
+.CampaignInfoLayout .CampaignInfoCard {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .CampaignInfoLayout {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="../Style.css" />
+    <script defer src="../Scripts/TopBarLoader.js"></script>
+    <script defer src="../Scripts/CampaignInfoLoader.js"></script>
+  </head>
+  <body>
+    <div id="topbar-placeholder"></div>
+    <div class="CampaignInfo"></div>
+    <script>
+      // Get campaign title from query string, e.g. ?title=cow
+      function getQueryParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+      }
+      window.loadCampaignInfo = async function loadCampaignInfo(txtFilePath) {
+        try {
+          const resp = await fetch(txtFilePath, { cache: "no-store" });
+          if (!resp.ok) throw new Error(`Failed to fetch ${txtFilePath}`);
+          const txt = await resp.text();
+          const lines = txt.split(/\r?\n/).filter(Boolean);
+          const info = {};
+          lines.forEach((line) => {
+            const m = line.match(/^([A-Z_]+):\s*(.*)$/i);
+            if (m) info[m[1].toUpperCase()] = m[2];
+          });
+
+          // Build HTML output
+          const container =
+            document.querySelector(".CampaignInfo") || document.body;
+          container.innerHTML = "";
+          const title = info.TITLE || "Untitled Campaign";
+          const org = info.ORGANISATION || "";
+          const shortDesc = info.SHORT_DESCRIPTION || "";
+          const longDesc = info.LONG_DESCRIPTION || "";
+          const algoPaid = info.ALGO_PAID_PER_SUBMISSION || "";
+          const maxSubs = info.MAX_SUBMISSIONS || "";
+          const logo = info.LOGO || "Background.jpg";
+          const datatypes = info.DATATYPES || "";
+
+          // Parse DATATYPES array: [JPG - "a cat" , PNG - "a dog"]
+          const datatypeMatches =
+            datatypes.match(/([A-Z]+)\s*-\s*"([^"]*)"/gi) || [];
+          const parsedTypes = datatypeMatches
+            .map((m) => {
+              const parts = m.match(/([A-Z]+)\s*-\s*"([^"]*)"/i);
+              return parts
+                ? { type: parts[1].toUpperCase(), desc: parts[2] }
+                : null;
+            })
+            .filter(Boolean);
+
+          const uploadButtonsHtml = parsedTypes
+            .map(
+              (dt, i) => `
+            <div class="UploadItem">
+              <label for="upload-${i}">${dt.type}: ${dt.desc}</label>
+              <input type="file" id="upload-${i}" accept=".${dt.type.toLowerCase()}" class="UploadInput" />
+            </div>
+          `
+            )
+            .join("");
+
+          container.innerHTML = `
+      <div class="CampaignInfoLayout">
+        <div class="CampaignDetails">
+          <div class="CampaignInfoCard">
+            <img src="../Immages/${logo}" alt="${title}" class="CampaignLogo" />
+            <h1>${title}</h1>
+            <h3>${org}</h3>
+            <p><strong>Campaign description and goals:</strong></p>
+            <p>${longDesc}</p>
+            <p><strong>ALGO Paid per Submission:</strong> ${algoPaid}</p>
+            <p><strong>Maximum number of Submissions:</strong> ${maxSubs}</p>
+          </div>
+        </div>
+        <div class="CampaignUploads">
+          <div class="CampaignInfoCard">
+            <div class="UploadSection">
+              <h3>Submit Your Data</h3>
+              ${uploadButtonsHtml}
+              <button type="button" class="SubmitDataButton">Submit to Campaign</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+          // After rendering, set title color from average image color
+          const imgEl = container.querySelector(".CampaignLogo");
+          const titleEl = container.querySelector(".CampaignInfoCard h1");
+          if (imgEl && titleEl) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = imgEl.src;
+            img.onload = function () {
+              try {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                ctx.drawImage(img, 0, 0);
+                const data = ctx.getImageData(
+                  0,
+                  0,
+                  canvas.width,
+                  canvas.height
+                ).data;
+                let r = 0,
+                  g = 0,
+                  b = 0,
+                  count = 0;
+                const step = Math.max(4, Math.floor(data.length / 4 / 1000000)); // sample up to ~10k pixels
+                for (let i = 0; i < data.length; i += 4 * step) {
+                  r += data[i];
+                  g += data[i + 1];
+                  b += data[i + 2];
+                  count++;
+                }
+                if (count) {
+                  r = Math.round(r / count);
+                  g = Math.round(g / count);
+                  b = Math.round(b / count);
+
+                  // Helper: RGB [0-255] -> HSL (h in [0,360), s,l in [0,1])
+                  function rgbToHsl(R, G, B) {
+                    R /= 255;
+                    G /= 255;
+                    B /= 255;
+                    const max = Math.max(R, G, B),
+                      min = Math.min(R, G, B);
+                    let h,
+                      s,
+                      l = (max + min) / 2;
+                    if (max === min) {
+                      h = s = 0; // achromatic
+                    } else {
+                      const d = max - min;
+                      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                      switch (max) {
+                        case R:
+                          h = (G - B) / d + (G < B ? 6 : 0);
+                          break;
+                        case G:
+                          h = (B - R) / d + 2;
+                          break;
+                        case B:
+                          h = (R - G) / d + 4;
+                          break;
+                      }
+                      h *= 60;
+                    }
+                    return { h, s, l };
+                  }
+
+                  // Helper: HSL -> RGB [0-255]
+                  function hslToRgb(h, s, l) {
+                    h = ((h % 360) + 360) % 360; // normalize
+                    const c = (1 - Math.abs(2 * l - 1)) * s;
+                    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+                    const m = l - c / 2;
+                    let r1, g1, b1;
+                    if (h < 60) {
+                      r1 = c;
+                      g1 = x;
+                      b1 = 0;
+                    } else if (h < 120) {
+                      r1 = x;
+                      g1 = c;
+                      b1 = 0;
+                    } else if (h < 180) {
+                      r1 = 0;
+                      g1 = c;
+                      b1 = x;
+                    } else if (h < 240) {
+                      r1 = 0;
+                      g1 = x;
+                      b1 = c;
+                    } else if (h < 300) {
+                      r1 = x;
+                      g1 = 0;
+                      b1 = c;
+                    } else {
+                      r1 = c;
+                      g1 = 0;
+                      b1 = x;
+                    }
+                    return [
+                      Math.round((r1 + m) * 255),
+                      Math.round((g1 + m) * 255),
+                      Math.round((b1 + m) * 255),
+                    ];
+                  }
+
+                  // Enforce minimum vibrancy (saturation) and clamp lightness
+                  const { h, s, l } = rgbToHsl(r, g, b);
+                  const minS = 0.65; // minimum saturation (0..1)
+                  const minL = 0.35; // keep readable on dark bg
+                  const maxL = 0.72; // avoid too bright/pastel
+                  const s2 = Math.max(s, minS);
+                  const l2 = Math.max(minL, Math.min(maxL, l));
+                  const [r2, g2, b2] = hslToRgb(h, s2, l2);
+
+                  // Apply to title
+                  const vibrantColor = `rgb(${r2}, ${g2}, ${b2})`;
+                  titleEl.style.color = vibrantColor;
+
+                  // Also apply to TopBar button colors via CSS variables
+                  // Use a slightly darker variant for hover by reducing lightness
+                  const lHover = Math.max(0.2, l2 - 0.12);
+                  const [hr, hg, hb] = hslToRgb(h, s2, lHover);
+                  const hoverColor = `rgb(${hr}, ${hg}, ${hb})`;
+                  const rootStyle = document.documentElement.style;
+                  rootStyle.setProperty("--top-bar-button-color", vibrantColor);
+                  rootStyle.setProperty(
+                    "--top-bar-button-hover-color",
+                    hoverColor
+                  );
+                }
+              } catch (e) {
+                // ignore if canvas tainted or other errors
+              }
+            };
+          }
+        } catch (err) {
+          document.body.innerHTML = `<div style="color:red">Error: ${err.message}</div>`;
+        }
+      };
+
+      const campaignTitle = getQueryParam("title");
+      if (campaignTitle) {
+        const txtPath = `../cards/${campaignTitle}.txt`;
+        if (window.loadCampaignInfo) {
+          window.loadCampaignInfo(txtPath);
+        } else {
+          alert("CampaignInfoLoader is not loaded. Check script path.");
+        }
+      } else {
+        alert("Failed to fetch Campaign.");
+      }
+    </script>
+  </body>
+</html>

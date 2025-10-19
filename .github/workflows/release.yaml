@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.vscode/**'
+      - '.idea/**'
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  bount3-contracts-validate:
+    name: Run bount3-contracts release
+    secrets: inherit
+    uses: ./.github/workflows/bount3-contracts-ci.yaml
+
+  bount3-contracts-release:
+    name: Run bount3-contracts release
+    secrets: inherit
+    uses: ./.github/workflows/bount3-contracts-cd.yaml
+    needs: bount3-contracts-validate
+
+  bount3-frontend-validate:
+    name: Run bount3-frontend release
+    secrets: inherit
+    uses: ./.github/workflows/bount3-frontend-ci.yaml
+
+  bount3-frontend-release:
+    name: Run bount3-frontend release
+    secrets: inherit
+    uses: ./.github/workflows/bount3-frontend-cd.yaml
+    needs: bount3-frontend-validate
