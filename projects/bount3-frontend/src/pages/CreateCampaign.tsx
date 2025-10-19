@@ -588,48 +588,6 @@ export default function CreateCampaign() {
           <p>{preview.shortDescription}</p>
           <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'rgba(255, 255, 255, 0.92)' }}>{preview.longDescription}</p>
         </div>
-
-        <div className="TilesGrid" style={{ marginTop: '2em' }}>
-          <div className="DataTile" style={{ borderColor: 'var(--cat-image-border)' }}>
-            <div className="TileHeader">
-              <strong>Reward</strong>
-              <span>{preview.algoPaid}</span>
-            </div>
-            <p>Reward contributors with ALGO per approved submission. Consider bonuses for high-impact work.</p>
-          </div>
-
-          <div className="DataTile" style={{ borderColor: 'var(--cat-video-border)' }}>
-            <div className="TileHeader">
-              <strong>Submission cap</strong>
-              <span>{preview.maxSubmissions}</span>
-            </div>
-            <p>Prevent overwhelm by capping the number of submissions reviewers need to process.</p>
-          </div>
-
-          <div className="DataTile" style={{ borderColor: 'var(--cat-data-border)' }}>
-            <div className="TileHeader">
-              <strong>Platform fee</strong>
-              <span>{preview.platformFee}</span>
-            </div>
-            <p>We automatically reserve 5% to keep the bounty marketplace running and secure.</p>
-          </div>
-
-          <div className="DataTile" style={{ borderColor: 'var(--cat-audio-border)' }}>
-            <div className="TileHeader">
-              <strong>Security deposit</strong>
-              <span>{preview.securityDeposit}</span>
-            </div>
-            <p>The deposit is held in escrow so you can pay out contributors without delay.</p>
-          </div>
-
-          <div className="DataTile" style={{ borderColor: 'var(--cat-doc-border)' }}>
-            <div className="TileHeader">
-              <strong>Metadata</strong>
-              <span>IPFS</span>
-            </div>
-            <p>Campaign details are pinned to IPFS via the backend. Share the resulting CID with your community.</p>
-          </div>
-        </div>
       </div>
     </section>
   )

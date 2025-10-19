@@ -98,21 +98,33 @@ export default function TopBar() {
   return (
     <header className="TopBar">
       <nav style={{ display: 'flex', gap: 12, alignItems: 'center', width: '100%' }}>
-        <div style={{ fontWeight: 700, marginRight: 'auto', color: 'white' }}>Bount3 (placeholder logo)</div>
+        <a
+          href="/"
+          style={{
+            marginRight: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
+            textDecoration: 'none',
+            padding: '8px 0',
+          }}
+        >
+          <img
+            src="/Immages/LogoCropped.png"
+            alt="Bount3 logo"
+            style={{ height: '100%', width: 'auto', display: 'block', maxHeight: '59px', borderRadius: '8px' }}
+          />
+        </a>
         <a className="TopBarButton" href="/">
           Public campaigns
         </a>
         <a className="TopBarButton" href="/your-campaigns">
           Your campaigns
         </a>
-        <a className="TopBarButton" href="/create">
-          Create campaign
-        </a>
         <button className="TopBarButton" data-test-id="connect-wallet" onClick={handleWalletButtonClick} disabled={isAutoConnecting}>
           {isAutoConnecting ? 'Connecting...' : activeAddress ? `Manage ${ellipseAddress(activeAddress)}` : 'Connect Wallet'}
         </button>
         <a className="TopBarButton" href="/contact">
-          Contact us
+          About and Contact
         </a>
       </nav>
 

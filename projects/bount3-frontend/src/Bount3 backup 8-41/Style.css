@@ -120,10 +120,13 @@ a.WelcomeButton:hover {
   list-style: none;
 }
 
-a.TopBarButton {
+a.TopBarButton,
+button.TopBarButton,
+.TopBarButton {
   color: var(--top-bar-button-text-color);
   font-size: var(--top-bar-button-text-size);
   font-weight: 75;
+  font-family: var(--page-font);
   background: var(--top-bar-button-color);
   transition: background 0.4s;
   padding: var(--top-bar-button-height-padding) var(--top-bar-button-width-padding);
@@ -131,9 +134,13 @@ a.TopBarButton {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+  border-color: rgba(0, 0, 0, 0);
+  border: none;
 }
 
-a.TopBarButton:hover {
+a.TopBarButton:hover,
+button.TopBarButton:hover,
+.TopBarButton:hover {
   background: var(--top-bar-button-hover-color);
 }
 
@@ -155,7 +162,8 @@ a.TopBarButton:hover {
 }
 
 /* Square, image-first cards */
-a.OptionCard {
+a.OptionCard,
+.OptionCard {
   display: block;
   position: relative;
   aspect-ratio: 1 / 1; /* keep cards perfectly square */
@@ -217,7 +225,9 @@ a.OptionCard {
 }
 
 a.OptionCard:hover,
-a.OptionCard:focus-visible {
+a.OptionCard:focus-visible,
+.OptionCard:hover,
+.OptionCard:focus-visible {
   background: var(--card-bg-hover);
   transform: translateY(-2px);
   box-shadow: var(--card-shadow);
@@ -232,6 +242,20 @@ img.OptionImage {
 /* example: remove blur on hover */
 a.OptionCard:hover img.OptionImage {
   filter: blur(0);
+}
+
+/* Verify grid overrides: solid background and no blur */
+.VerifyGrid .OptionCard {
+  background: #0b1020; /* solid dark */
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.VerifyGrid .OptionCard:hover,
+.VerifyGrid .OptionCard:focus-visible {
+  background: #101736;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.VerifyGrid img.OptionImage {
+  filter: none;
 }
 
 body {

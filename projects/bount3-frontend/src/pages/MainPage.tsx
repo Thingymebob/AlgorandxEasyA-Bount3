@@ -197,7 +197,6 @@ export default function MainPage() {
 
   return (
     <div>
-      <h2>Public campaigns</h2>
       {chainError && <div style={{ color: '#ffb4b4', marginBottom: '0.75rem' }}>Chain error: {chainError}</div>}
 
       {campaigns.length > 0 && (

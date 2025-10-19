@@ -471,7 +471,7 @@ export default function VerifyCampaign() {
       {!loading && !error && pending.length === 0 && <p style={{ opacity: 0.9 }}>No pending submissions.</p>}
 
       {submissions.length > 0 && (
-        <div className="OptionsGrid" style={{ marginTop: '1.75rem', marginBottom: '1.25rem' }}>
+        <div className="OptionsGrid VerifyGrid" style={{ marginTop: '1.75rem', marginBottom: '1.25rem' }}>
           {submissions.map((s) => (
             <div
               key={s.id}

@@ -215,18 +215,26 @@ export default function YourCampaigns() {
 
   return (
     <div>
-      <h2>Your campaigns</h2>
       {!activeAddress && <p style={{ opacity: 0.9 }}>Connect your wallet to see your campaigns.</p>}
       {error && <div style={{ color: '#ffb4b4', marginBottom: '0.75rem' }}>Error: {error}</div>}
 
-      {campaigns.length > 0 && (
-        <div className="OptionsGrid" style={{ marginBottom: '1.25rem' }}>
-          {campaigns.map((c, i) => (
-            // Your campaigns should navigate to the verify page
-            <CampaignCard key={i} campaign={c} href={c.cid ? `/campaign/verify/${encodeURIComponent(c.cid)}` : undefined} />
-          ))}
-        </div>
-      )}
+      <div className="OptionsGrid" style={{ marginBottom: '1.25rem' }}>
+        {/* Always-visible tile: Create your own campaign */}
+        <a className="OptionCard" href="/create">
+          <img className="OptionImage" src="/Immages/Create.jpg" alt="an image of a pencil drawing on paper" />
+          <div className="OptionInfoTop">
+            <h2>Create your own campaign</h2>
+          </div>
+          <div className="OptionInfoBottom">
+            <p>Create your own campaign to gather information for whatever your mind can think of!</p>
+          </div>
+        </a>
+
+        {/* Dynamically loaded campaigns (navigate to verify page) */}
+        {campaigns.map((c, i) => (
+          <CampaignCard key={i} campaign={c} href={c.cid ? `/campaign/verify/${encodeURIComponent(c.cid)}` : undefined} />
+        ))}
+      </div>
 
       {loading && campaigns.length === 0 && <p style={{ opacity: 0.85 }}>Loading your campaigns…</p>}
       {!loading && campaigns.length === 0 && !error && activeAddress && (

@@ -137,6 +137,10 @@ button.TopBarButton,
   cursor: pointer;
 }
 
+button.TopBarButton {
+  background-color: aqua;
+}
+
 a.TopBarButton:hover,
 button.TopBarButton:hover,
 .TopBarButton:hover {

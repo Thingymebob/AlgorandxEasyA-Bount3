@@ -1,6 +1,6 @@
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Bount3Factory } from '../contracts/Bount3'
 import { getLoraTxUrl } from '../utils/explorer'
@@ -23,6 +23,8 @@ export default function CampaignViewer() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const backendUrl = (import.meta.env.VITE_BACKEND_URL as string | undefined) || 'http://localhost:8000'
   const { transactionSigner, activeAddress } = useWallet()
+  const imgRef = useRef<HTMLImageElement | null>(null)
+  const titleRef = useRef<HTMLHeadingElement | null>(null)
 
   type FieldState = { type: string; desc: string; text?: string; bool?: boolean; file?: File | null }
   const [fields, setFields] = useState<FieldState[]>([])
@@ -104,6 +106,128 @@ export default function CampaignViewer() {
       void loadByTitle(title)
     }
   }, [mode, cid, title, backendUrl])
+
+  // Derive UI accent color from the campaign image like the legacy viewer
+  useEffect(() => {
+    const imgEl = imgRef.current
+    const titleEl = titleRef.current
+    if (!imgEl || !titleEl) return
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = imgEl.src
+    img.onload = function () {
+      try {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+        canvas.width = img.naturalWidth
+        canvas.height = img.naturalHeight
+        ctx.drawImage(img, 0, 0)
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+        let r = 0,
+          g = 0,
+          b = 0,
+          count = 0
+        const step = Math.max(4, Math.floor(data.length / 4 / 1000000)) // sample up to ~1M pixels, skip for speed
+        for (let i = 0; i < data.length; i += 4 * step) {
+          r += data[i]
+          g += data[i + 1]
+          b += data[i + 2]
+          count++
+        }
+        if (!count) return
+        r = Math.round(r / count)
+        g = Math.round(g / count)
+        b = Math.round(b / count)
+
+        function rgbToHsl(R: number, G: number, B: number) {
+          R /= 255
+          G /= 255
+          B /= 255
+          const max = Math.max(R, G, B),
+            min = Math.min(R, G, B)
+          let h = 0
+          let s = 0
+          const l = (max + min) / 2
+          if (max !== min) {
+            const d = max - min
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+            switch (max) {
+              case R:
+                h = (G - B) / d + (G < B ? 6 : 0)
+                break
+              case G:
+                h = (B - R) / d + 2
+                break
+              case B:
+                h = (R - G) / d + 4
+                break
+            }
+            h *= 60
+          }
+          return { h, s, l }
+        }
+
+        function hslToRgb(h: number, s: number, l: number) {
+          h = ((h % 360) + 360) % 360
+          const c = (1 - Math.abs(2 * l - 1)) * s
+          const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
+          const m = l - c / 2
+          let r1 = 0,
+            g1 = 0,
+            b1 = 0
+          if (h < 60) {
+            r1 = c
+            g1 = x
+            b1 = 0
+          } else if (h < 120) {
+            r1 = x
+            g1 = c
+            b1 = 0
+          } else if (h < 180) {
+            r1 = 0
+            g1 = c
+            b1 = x
+          } else if (h < 240) {
+            r1 = 0
+            g1 = x
+            b1 = c
+          } else if (h < 300) {
+            r1 = x
+            g1 = 0
+            b1 = c
+          } else {
+            r1 = c
+            g1 = 0
+            b1 = x
+          }
+          return [Math.round((r1 + m) * 255), Math.round((g1 + m) * 255), Math.round((b1 + m) * 255)] as const
+        }
+
+        const { h, s, l } = rgbToHsl(r, g, b)
+        const minS = 0.65
+        const minL = 0.35
+        const maxL = 0.72
+        const s2 = Math.max(s, minS)
+        const l2 = Math.max(minL, Math.min(maxL, l))
+        const [r2, g2, b2] = hslToRgb(h, s2, l2)
+        const vibrantColor = `rgb(${r2}, ${g2}, ${b2})`
+        titleEl.style.color = vibrantColor
+
+        const lHover = Math.max(0.2, l2 - 0.12)
+        const [hr, hg, hb] = hslToRgb(h, s2, lHover)
+        const hoverColor = `rgb(${hr}, ${hg}, ${hb})`
+        const rootStyle = document.documentElement.style
+        rootStyle.setProperty('--top-bar-button-color', vibrantColor)
+        rootStyle.setProperty('--top-bar-button-hover-color', hoverColor)
+      } catch {
+        // ignore errors (e.g., CORS-tainted canvas)
+      }
+    }
+
+    // Re-run when the image source changes
+  }, [campaign?.logo])
 
   if (error) return <div style={{ color: 'red' }}>Error: {error}</div>
   if (!campaign) return <div>Loading campaign...</div>
@@ -227,8 +351,8 @@ export default function CampaignViewer() {
 
   return (
     <div className="CampaignInfoCard">
-      <img className="CampaignLogo" src={campaign.logo || '/Immages/logo.png'} alt={campaign.title} />
-      <h1>{campaign.title}</h1>
+      <img ref={imgRef} className="CampaignLogo" src={campaign.logo || '/Immages/logo.png'} alt={campaign.title} />
+      <h1 ref={titleRef}>{campaign.title}</h1>
       <h3>{campaign.organisation}</h3>
       <p>
         <strong>Campaign description and goals:</strong>
