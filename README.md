@@ -1,55 +1,129 @@
-# bount3
+Bount3: Trustless payment system for collecting data
 
-This starter full stack project has been generated using AlgoKit. See below for default getting started instructions.
+Bount3 uses a combination of smart contracts, on-chain box storage and NFTs to create an easy-to-use, trustless, decentralised system so that users can earn for the data they can share.
 
-## Setup
+## VIDEO
 
-### Initial setup
-1. Clone this repository to your local machine.
-2. Ensure [Docker](https://www.docker.com/) is installed and operational. Then, install `AlgoKit` following this [guide](https://github.com/algorandfoundation/algokit-cli#install).
-3. Run `algokit project bootstrap all` in the project directory. This command sets up your environment by installing necessary dependencies, setting up a Python virtual environment, and preparing your `.env` file.
-4. In the case of a smart contract project, execute `algokit generate env-file -a target_network localnet` from the `bount3-contracts` directory to create a `.env.localnet` file with default configuration for `localnet`.
-5. To build your project, execute `algokit project run build`. This compiles your project and prepares it for running.
-6. For project-specific instructions, refer to the READMEs of the child projects:
-   - Smart Contracts: [bount3-contracts](projects/bount3-contracts/README.md)
-   - Frontend Application: [bount3-frontend](projects/bount3-frontend/README.md)
+## IMAGES
 
-> This project is structured as a monorepo, refer to the [documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md) to learn more about custom command orchestration via `algokit project run`.
+![Create New Campaign](readmeassets/CreateNew.png)
 
-### Subsequently
+![Your Campaigns](readmeassets/YourCampaigns.png)
 
-1. If you update to the latest source code and there are new dependencies, you will need to run `algokit project bootstrap all` again.
-2. Follow step 3 above.
+![Public Campaigns](readmeassets/publicCampaigns.png)
 
-### Continuous Integration / Continuous Deployment (CI/CD)
+![Submit Data](readmeassets/SubmitData.png)
 
-This project uses [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions) to define CI/CD workflows, which are located in the [`.github/workflows`](./.github/workflows) folder. You can configure these actions to suit your project's needs, including CI checks, audits, linting, type checking, testing, and deployments to TestNet.
+The Smart Contract:
+This handles all of the information writing and editing needed on-chain, as well as handling the custom ASA (BOUNT) and trustless transaction of Algos.
 
-For pushes to `main` branch, after the above checks pass, the following deployment actions are performed:
-  - The smart contract(s) are deployed to TestNet using [AlgoNode](https://algonode.io).
-  - The frontend application is deployed to a provider of your choice (Netlify, Vercel, etc.). See [frontend README](frontend/README.md) for more information.
+Functions:
 
-> Please note deployment of smart contracts is done via `algokit deploy` command which can be invoked both via CI as seen on this project, or locally. For more information on how to use `algokit deploy` please see [AlgoKit documentation](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/deploy.md).
+    addSecret(bytes32 hashedSecret, string memory uri):
+    Adds a new event secret and links it to an IPFS metadata URI. Enables infinite event expansion without redeployments.
 
-## Tools
+    verifyAndMarkUsed(bytes32 hashedSecret, address user) returns (string):
+    Verifies if the secret is valid, ensures the wallet has not used it yet, marks it as used, and returns the metadata URI for minting.
 
-This project makes use of Python and React to build Algorand smart contracts and to provide a base project configuration to develop frontends for your Algorand dApps and interactions with smart contracts. The following tools are in use:
+    hasUserMinted(bytes32 hashedSecret, address user):
+    Read-only check to see if a wallet has already minted with a given secret.
 
-- Algorand, AlgoKit, and AlgoKit Utils
-- Python dependencies including Poetry, Black, Ruff or Flake8, mypy, pytest, and pip-audit
-- React and related dependencies including AlgoKit Utils, Tailwind CSS, daisyUI, use-wallet, npm, jest, playwright, Prettier, ESLint, and Github Actions workflows for build validation
+Security:
 
-### VS Code
+    all transactions are trustless and documented on the blockchain publicaly
+    the campaign organiser is prevented from taking the data without paying the contributor with a system of partial information withholding like watermarks in video, audio and immages. partial withholding of a part of text file formats when possible
 
-It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [backend .vscode](./backend/.vscode) and [frontend .vscode](./frontend/.vscode) folders for more details.
+###############################################################################################################
+Security:
 
-## Integrating with smart contracts and application clients
+    Secret words are hashed off-chain (SHA-256 or similar) before storage.
+    No plain-text secrets are stored on-chain, preventing scanning/cheating.
 
-Refer to the [bount3-contracts](projects/bount3-contracts/README.md) folder for overview of working with smart contracts, [projects/bount3-frontend](projects/bount3-frontend/README.md) for overview of the React project and the [projects/bount3-frontend/contracts](projects/bount3-frontend/src/contracts/README.md) folder for README on adding new smart contracts from backend as application clients on your frontend. The templates provided in these folders will help you get started.
-When you compile and generate smart contract artifacts, your frontend component will automatically generate typescript application clients from smart contract artifacts and move them to `frontend/src/contracts` folder, see [`generate:app-clients` in package.json](projects/bount3-frontend/package.json). Afterwards, you are free to import and use them in your frontend application.
+Scalability:
 
-The frontend starter also provides an example of interactions with your BountClient in [`AppCalls.tsx`](projects/bount3-frontend/src/components/AppCalls.tsx) component by default.
+    New secret codes can be added anytime by calling addSecret(), supporting continuous event launches without new contract deployments.
 
-## Next Steps
+🛠 Contract 2: SecretPOAPNFT.sol
+Purpose:
 
-You can take this project and customize it to build your own decentralized applications on Algorand. Make sure to understand how to use AlgoKit and how to write smart contracts for Algorand before you start.
+Handles the minting and management of ERC-721 digital collectibles.
+Key Functions:
+
+    mint(address to, string memory uri):
+    Mints a new NFT to a user with the provided IPFS metadata URI.
+
+    updateMinter(address newMinter):
+    Restricts minting rights to the Router contract after initial deployment.
+
+Security:
+
+    Initially, the deployer had minting rights.
+    After deployment, mint rights are transferred to the Router contract using updateMinter().
+    Prevents unauthorized NFT minting.
+
+Minimalist Design:
+
+    Focused only on minting and ownership functions to stay gas-efficient and within Polkadot's 49 KB limit.
+
+🛠 Contract 3: SecretPOAPRouter.sol
+Purpose:
+
+Handles user interactions and mint flow logic.
+Key Functions:
+
+    mintWithSecret(string memory secretWord):
+    Accepts user input, hashes it, verifies it with the Manager, and mints an NFT if valid.
+
+    setSecretCodeManager(address _manager):
+    Updates the SecretCodeManager address (admin-only).
+
+    setNFTContract(address _nft):
+    Updates the NFT contract address (admin-only).
+
+Security:
+
+    Only allows minting if the secret is verified and unused for the wallet.
+    Central controller ensuring users can't bypass security and mint directly.
+
+🔒 Key Security Features
+
+    Hashed Secrets:
+    Secrets are never exposed on-chain. Users must genuinely know the correct secret to mint.
+
+    Single-Use Protection:
+    Each wallet can only mint once per secret.
+
+    Upgradeable System:
+    Admins can update Secret Manager or NFT contract addresses without redeploying the entire Router.
+
+    Only Authorized Minting:
+    NFT contract only accepts minting calls from the authorized Router.
+
+🔗 System Interaction Flow
+
+    User connects wallet and submits a secret word on the frontend.
+    Frontend hashes the secret word.
+    Router calls verifyAndMarkUsed() on Manager:
+        Verifies the secret.
+        Marks the secret as used for that wallet.
+        Fetches the associated metadata URI.
+    Router calls mint() on the NFT contract:
+        NFT is minted with the returned metadata.
+    User receives the collectible in their wallet.
+
+✅ Final Summary
+
+This smart contract architecture ensures that:
+
+    Only real event attendees can mint their POAPs.
+    Secrets are protected on-chain.
+    Mass minting scales smoothly with Polkadot's Elastic Coretime.
+    New events can be added without disruption.
+
+Blocklink : https://blockscout-asset-hub.parity-chains-scw.parity.io/address/0x16E5BA2A5713E036B2dd10BA1c5861728FAb6D23?tab=contract
+
+Website has been published at : https://mahir-pa.github.io/poap
+
+Presentation slides : https://www.canva.com/design/DAGlwOQ7U-k/3AZU1fcIiz6qfhmwpOQ-Hw/edit?utm_content=DAGlwOQ7U-k&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
+Twitter thread : https://x.com/pramay07_/status/1916258393859248542
