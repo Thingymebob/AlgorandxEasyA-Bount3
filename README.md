@@ -2,63 +2,6 @@ Bount3: Trustless payment system for collecting data
 
 Bount3 uses a combination of smart contracts, on-chain box storage and NFTs to create an easy-to-use, trustless, decentralised system so that users can earn for the data they can share.
 
-## VIDEO
-
-Demo video: (https://youtu.be/ws24FTdSk3o)
-
-## IMAGES
-
-<p align="center">
-    <img src="readmeassets/CreateNew.png" alt="Create New Campaign" width="49%" />
-    <img src="readmeassets/YourCampaigns.png" alt="Your Campaigns" width="49%" />
-    <br/>
-    <img src="readmeassets/publicCampaigns.png" alt="Public Campaigns" width="49%" />
-    <img src="readmeassets/SubmitData.png" alt="Submit Data" width="49%" />
-    <br/>
-    <sub>UI screenshots: Create, Your Campaigns, Public Campaigns, Submit Data</sub>
-
-</p>
-
-## Features
-
-- Create, browse, and verify on-chain data bounty campaigns
-- Trustless reward payouts in Algo and a platform token (BOUNT)
-- IPFS integration for campaign and submission metadata via a FastAPI backend
-- Wallet connect (Pera/Defly/WalletConnect) using @txnlab/use-wallet-react
-- LocalNet-friendly setup using AlgoKit
-
-## Repository structure
-
-```
-ROOT/
-  README.md
-  readmeassets/                  # Images for this README
-  projects/
-     bount3-frontend/            # React + Vite (TypeScript)
-     bount3-backend/             # FastAPI service for IPFS (Pinata)
-     bount3-contracts/           # Algorand smart contracts (algopy / ARC-4)
-```
-
-## Tech stack
-
-- Frontend: React 18, Vite, TypeScript, Tailwind
-- Wallet: @txnlab/use-wallet-react (+ Pera/Defly connectors)
-- Contracts: algopy (ARC-4), AlgoKit utils
-- Backend: FastAPI + requests (Pinata IPFS)
-
-## Local development (AlgoKit LocalNet)
-
-Prerequisites:
-- Node 20+, npm 9+
-- Python 3.12+
-- Poetry (for contracts) and/or a venv
-- Docker + AlgoKit (for LocalNet)
-
-Steps:
-Bount3: Trustless payment system for collecting data
-
-Bount3 uses a combination of smart contracts, on-chain box storage and NFTs to create an easy-to-use, trustless, decentralised system so that users can earn for the data they can share.
-
 ## Summary (<=150 chars)
 
 Decentralized data bounties on Algorand: create campaigns, submit data, verify, and get paid trustlessly in Algo and BOUNT.
@@ -104,13 +47,20 @@ Walkthrough with audio (repo tour, architecture, and full demo): [Add Loom/YouTu
 ## Smart contracts overview
 
 Contract `Bount3` (algopy ARC-4):
-- `mint_coin()` – Create ASA “BOUNT” managed by the app
-- `createCampaign(IPFSHash, payTxn, depositAmount, feeAmount, goalSubmissions, paidAmount)` – Create a campaign, escrow funds, compute pay per person
-- `sendSubmission(IPFSHash, campaignHash)` – Submit to a campaign
-- `verifySubmission(submissionHash)` – Mark verified and pay Algo + BOUNT to the submitter
-- `declineSubmission(submissionHash)` – Mark declined
-- `closeCampaign(campaignHash)` – Refund remaining deposit to creator and remove storage
-- `optInAsset()` – Opt-in helper via zero-amount transfer
+
+- `mint_coin()` – Deploys a new Algorand Standard Asset (ASA) called “BOUNT” managed by the contract. This token is used for campaign rewards. Only callable by the contract itself; stores the asset ID for later use.
+
+- `createCampaign(IPFSHash, payTxn, depositAmount, feeAmount, goalSubmissions, paidAmount)` – Creates a new campaign. The creator escrows funds (Algo and BOUNT) in the contract, specifying the IPFS hash for metadata, deposit for refunds, and the number of required submissions. The contract calculates the per-person payout and stores all campaign details on-chain. Emits a log for frontend indexing.
+
+- `sendSubmission(IPFSHash, campaignHash)` – Allows a user to submit data to a campaign. The submission’s metadata is stored on IPFS, and the contract records the submission’s hash, creator, and status. Emits a log for tracking.
+
+- `verifySubmission(submissionHash)` – Called by a campaign reviewer to mark a submission as verified. The contract updates the submission and campaign state, then pays the submitter both Algo and BOUNT tokens using inner transactions. Ensures only pending submissions are processed and that the campaign has not reached its goal. Emits a log for frontend updates.
+
+- `declineSubmission(submissionHash)` – Marks a submission as declined (not eligible for reward). Updates the submission’s status and emits a log. No funds are transferred.
+
+- `closeCampaign(campaignHash)` – Allows the campaign creator to close their campaign. Refunds any unspent deposit (Algo) to the creator, deletes the campaign’s on-chain storage, and emits a closure log. Only the original creator can close their campaign.
+
+- `optInAsset()` – Lets a user opt in to the BOUNT ASA by sending a zero-amount transfer from the contract to the user. Required for users to receive BOUNT rewards.
 
 Emitted logs:
 - `campaign_created:<creator>:<ipfs>`
@@ -119,64 +69,4 @@ Emitted logs:
 - `submission_declined:<submissionHash>:<creator>`
 - `campaign_closed:<campaignHash>:<creator>`
 
-## Repository structure
-
-```
-ROOT/
-  README.md
-  readmeassets/                  # Images for this README
-  projects/
-    bount3-frontend/            # React + Vite (TypeScript)
-    bount3-backend/             # FastAPI service for IPFS (Pinata)
-    bount3-contracts/           # Algorand smart contracts (algopy / ARC-4)
-```
-
-## Local development (AlgoKit LocalNet)
-
-Prerequisites:
-- Node 20+, npm 9+
-- Python 3.12+
-- Poetry (for contracts) and/or a venv
-- Docker + AlgoKit (for LocalNet)
-
-Steps:
-1) Start LocalNet (root): VS Code Task “Start AlgoKit LocalNet” or `algokit localnet start`
-2) Frontend: `cd projects/bount3-frontend && npm install && npm run dev`
-3) Backend: `cd projects/bount3-backend && pip install -r requirements.txt && uvicorn backend:app --reload`
-   - Set `.env` with `PINATA_JWT=<token>`
-4) Contracts: `cd projects/bount3-contracts && poetry install && poetry run python -m smart_contracts build`
-
-## Environment configuration
-
-Frontend `.env` (LocalNet defaults):
-- `VITE_ALGOD_SERVER=http://localhost`, `VITE_ALGOD_PORT=4001`, `VITE_ALGOD_NETWORK=localnet`
-- `VITE_INDEXER_SERVER=http://localhost`, `VITE_INDEXER_PORT=8980`
-- `VITE_BOUNT3_APP_ID=1002` (update if you deploy a new app)
-
-Backend `.env`:
-- `PINATA_JWT=<your pinata jwt>`
-
-## Block explorer
-
-- LocalNet (Lora): Transactions template available in code (`VITE_LORA_TX_URL_TEMPLATE`)
-- TestNet/MainNet: After deploying, add your App ID and link, e.g.
-  - TestNet: https://lora.algokit.io/testnet/application/APP_ID
-  - MainNet: https://lora.algokit.io/mainnet/application/APP_ID
-
-## Team & slides
-
-- Slides (Canva): https://www.canva.com/design/DAGlwOQ7U-k/3AZU1fcIiz6qfhmwpOQ-Hw
-- Short team intro: add a “Team” slide (names, roles, institution)
-
-## Judging checklist mapping
-
-- Innovation & Originality: Open, on-chain bounty marketplace with verifiable payouts
-- Usability & Design: Simple flows (create, submit, verify), responsive UI, clear cards
-- Impact Potential: General-purpose data collection for research, ML, and civic apps
-- Feasibility: Working LocalNet prototype with clear path to TestNet/MainNet
-- Use of Blockchain: ARC-4 contract, inner txns, ASA payouts, event logs
-- Technical Implementation: Custom contract (algopy), typed frontend, and backend/IPFS
-
-## License
-
-Open source. Feel free to fork and extend for your use case.
+Block explorer? https://lora.algokit.io/localnet
