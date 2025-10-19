@@ -6,13 +6,16 @@ Bount3 uses a combination of smart contracts, on-chain box storage and NFTs to c
 
 ## IMAGES
 
-![Create New Campaign](readmeassets/CreateNew.png)
-
-![Your Campaigns](readmeassets/YourCampaigns.png)
-
-![Public Campaigns](readmeassets/publicCampaigns.png)
-
-![Submit Data](readmeassets/SubmitData.png)
+<p align="center">
+    <img src="readmeassets/CreateNew.png" alt="Create New Campaign" width="49%" />
+    <img src="readmeassets/YourCampaigns.png" alt="Your Campaigns" width="49%" />
+    <br/>
+    <img src="readmeassets/publicCampaigns.png" alt="Public Campaigns" width="49%" />
+    <img src="readmeassets/SubmitData.png" alt="Submit Data" width="49%" />
+    <br/>
+    <sub>UI screenshots: Create, Your Campaigns, Public Campaigns, Submit Data</sub>
+  
+</p>
 
 The Smart Contract:
 This handles all of the information writing and editing needed on-chain, as well as handling the custom ASA (BOUNT) and trustless transaction of Algos.
