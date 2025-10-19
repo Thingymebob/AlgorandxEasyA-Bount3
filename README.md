@@ -4,6 +4,15 @@ Bount3 uses a combination of smart contracts, on-chain box storage and NFTs to c
 
 ## VIDEO
 
+<p align="center">
+    <video src="readmeassets/Algorand2.mov" controls playsinline loop muted style="max-width: 100%; width: 840px; height: auto; border-radius: 8px;">
+        Your browser does not support the video tag. You can
+        <a href="readmeassets/Algorand2.mov">download the video here</a>.
+    </video>
+    <br/>
+    <sub>If playback doesn’t start on your device, use the link above to download and view locally.</sub>
+</p>
+
 ## IMAGES
 
 <p align="center">
@@ -14,7 +23,7 @@ Bount3 uses a combination of smart contracts, on-chain box storage and NFTs to c
     <img src="readmeassets/SubmitData.png" alt="Submit Data" width="49%" />
     <br/>
     <sub>UI screenshots: Create, Your Campaigns, Public Campaigns, Submit Data</sub>
-  
+
 </p>
 
 The Smart Contract:
