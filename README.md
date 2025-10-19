@@ -14,7 +14,7 @@ Organizations and researchers need real-world data, but current collection metho
 
 Watch: https://youtu.be/ws24FTdSk3o
 
-Walkthrough with audio (repo tour, architecture, and full demo): [Add Loom/YouTube link]
+Walkthrough with audio (repo tour, architecture, and full demo)
 
 ## UI screenshots
 
